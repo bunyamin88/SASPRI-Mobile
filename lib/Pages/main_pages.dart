@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:saspri_mobile/Pages/feature/certification/activity_history.dart';
+import 'package:saspri_mobile/Pages/feature/certification/cert_history.dart';
+import 'package:saspri_mobile/Pages/feature/certification/cert_submission.dart';
+import 'package:saspri_mobile/Pages/feature/region/cert_detail.dart';
+import 'package:saspri_mobile/Pages/feature/region/member_list.dart';
+import 'package:saspri_mobile/Pages/feature/region/org_details.dart';
 //import 'package:saspri_mobile/Widget/card/vertical_card.dart';
 // import 'package:saspri_mobile/Widget/button/nav_button.dart';
 import 'package:saspri_mobile/Widget/progress_bar.dart';
@@ -6,6 +12,8 @@ import 'package:saspri_mobile/Widget/region_card/region_rep_card.dart';
 import 'package:saspri_mobile/Widget/region_choice.dart';
 import 'package:saspri_mobile/Widget/user_card/user_card.dart';
 import 'package:saspri_mobile/helper/enum.dart';
+import 'package:saspri_mobile/models/feature_item.dart';
+import 'package:saspri_mobile/models/user.dart';
 
 
 class MainPage extends StatefulWidget {
@@ -85,25 +93,93 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class CertPage extends StatelessWidget {
-  const CertPage({super.key});
+  final User user;
+  CertPage({super.key, required this.user});
+  final listFeatureItems = [
+  FeatureItem(
+    icon: Icons.history_outlined,
+    label: "Riwayat Aktivitas",
+    page: ActivityHistory(),
+    allowedRoles: [
+      UserRole.member,
+      UserRole.rep,
+    ],
+  ),
 
+  FeatureItem(
+    icon: Icons.archive_outlined,
+    label: "Riwayat Sertifikasi",
+    page: CertificationHistory(),
+    allowedRoles: [
+      UserRole.member,
+      UserRole.rep,
+    ],
+  ),
+
+  FeatureItem(
+    icon: Icons.upload_file_outlined,
+    label: "Ajukan Sertifikasi",
+    page: CertificationSubmission(),
+    allowedRoles: [
+      UserRole.rep,
+    ],
+  ),
+];
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
-      child : RegionChoice(role: UserRole.admin,)
+      child : FeatureGrid(
+              role: user.role,
+              features: listFeatureItems,
+            )
     );
   }
 }
 
 class RegionPage extends StatelessWidget {
-  const RegionPage({super.key});
+  final User user;
+  RegionPage({super.key, required this.user});
+  final listFeatureItems = [
+  FeatureItem(
+    icon: Icons.list_alt,
+    label: "Profil Kawasan",
+    page: OrganizationDetails(),
+    allowedRoles: [
+      UserRole.member,
+      UserRole.rep,
+    ],
+  ),
 
+  FeatureItem(
+    icon: Icons.verified,
+    label: "Sertifikat Kawasan",
+    page: CertificateDetail(),
+    allowedRoles: [
+      UserRole.member,
+      UserRole.rep,
+    ],
+  ),
+
+  FeatureItem(
+    icon: Icons.group,
+    label: "Anggota Kawasan",
+    page: MemberList(),
+    allowedRoles: [
+      UserRole.member,
+      UserRole.rep,
+    ],
+  ),
+];
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
-      child : RegionChoice(role: UserRole.admin,)
+      child : FeatureGrid(
+              role: user.role,
+              features: listFeatureItems,
+              
+            )
     );
   }
 }

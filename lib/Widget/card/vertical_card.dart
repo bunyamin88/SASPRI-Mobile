@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
 
 class VerticalCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color backgroundColor;
-  final Color iconColor;
-  final Color textColor;
-  final VoidCallback? onTap;
+  IconData icon;
+  String label;
+  Color backgroundColor;
+  Color iconColor;
+  Color textColor;
+  VoidCallback? onTap;
+  Widget page;
 
-  const VerticalCard({
+  VerticalCard({
     super.key,
     required this.icon,
     required this.label,
@@ -17,6 +18,7 @@ class VerticalCard extends StatelessWidget {
     this.iconColor = ColorPallate.buttonPrimary,
     this.textColor = ColorPallate.black,
     this.onTap,
+    required this.page,
   });
 
   @override
@@ -33,7 +35,14 @@ class VerticalCard extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => page,
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),

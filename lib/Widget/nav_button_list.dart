@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:saspri_mobile/Widget/button/nav_button.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
 import 'package:saspri_mobile/helper/enum.dart';
-import 'package:saspri_mobile/models/nav_items.dart';
+import 'package:saspri_mobile/Widget/nav_items.dart';
 
 class NavButtonList extends StatelessWidget {
   final int currentIndex;

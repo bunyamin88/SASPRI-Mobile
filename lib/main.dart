@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:saspri_mobile/Pages/main_pages.dart';
-import 'package:saspri_mobile/Widget/app_bar.dart';
+import 'package:saspri_mobile/Widget/main_appbar.dart';
 import 'package:saspri_mobile/Widget/button/nav_button.dart';
 import 'package:saspri_mobile/Widget/nav_button_list.dart';
 import 'package:saspri_mobile/Widget/progress_bar.dart';
@@ -9,6 +9,7 @@ import 'package:saspri_mobile/Widget/region_choice.dart';
 import 'package:saspri_mobile/Widget/user_card/user_card.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
 import 'package:saspri_mobile/helper/enum.dart';
+import 'package:saspri_mobile/models/user.dart';
 import 'Widget/region_card/region_rep_card.dart';
 
 
@@ -68,20 +69,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   UserRole role = UserRole.member;
+  final user = User(name: "Ahmad Afif", role: UserRole.rep);
   int currentIndex = 0;
-  List<Widget> pages = [
-    const MainPage(),
-    const RegionPage(),
-    const CertPage(),
-    const AdminVerifyPage(),
-    const AdminCertPage(),
-    const ProfilPage(),
-    const LoginPage(),
-  ];
+  
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
-
+    List<Widget> pages = [
+    MainPage(/* user: user */),
+    RegionPage(user: user),
+    CertPage(user: user),
+    AdminVerifyPage(/* user: user */),
+    AdminCertPage(/* user: user */),
+    ProfilPage(/* user: user */),
+    LoginPage(/* user: user */),
+  ];
     return Scaffold(
       backgroundColor: ColorPallate.background,
       appBar: MainAppBar(
@@ -95,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       bottomNavigationBar: SafeArea(
-        child: NavButtonList(role: role, currentIndex: currentIndex, onChanged: (index) {
+        child: NavButtonList(role: user.role, currentIndex: currentIndex, onChanged: (index) {
           setState(() {
             currentIndex = index;
           });

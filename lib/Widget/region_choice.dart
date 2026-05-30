@@ -1,68 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:saspri_mobile/Widget/card/vertical_card.dart';
 import 'package:saspri_mobile/helper/enum.dart';
+import 'package:saspri_mobile/models/feature_item.dart';
 
-class FeatureItem {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final List<UserRole> allowedRoles;
-
-  const FeatureItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.allowedRoles,
-  });
-}
-
-class RegionChoice extends StatelessWidget {
+class FeatureGrid extends StatelessWidget {
   final UserRole role;
+  final List<FeatureItem> features;
 
-  const RegionChoice({
+  const FeatureGrid({
     super.key,
-    this.role = UserRole.guest,
+    required this.role,
+    required this.features,
   });
-
-  static final List<FeatureItem> features = [
-    FeatureItem(
-      icon: Icons.home,
-      label: "Dashboard",
-      onTap: () {},
-      allowedRoles: [
-        UserRole.guest,
-        UserRole.member,
-        UserRole.rep,
-        UserRole.admin,
-      ],
-    ),
-
-    FeatureItem(
-      icon: Icons.person,
-      label: "Profile",
-      onTap: () {},
-      allowedRoles: [
-        UserRole.member,
-        UserRole.rep,
-        UserRole.admin,
-      ],
-    ),
-
-    FeatureItem(
-      icon: Icons.admin_panel_settings,
-      label: "Admin Panel",
-      onTap: () {},
-      allowedRoles: [
-        UserRole.admin,
-      ],
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
-
     final visibleFeatures = features.where(
-      (feature) => feature.allowedRoles.contains(role),
+      (feature) => feature.canAccess(role),
     );
 
     return Wrap(
@@ -72,7 +26,7 @@ class RegionChoice extends StatelessWidget {
         return VerticalCard(
           icon: feature.icon,
           label: feature.label,
-          onTap: feature.onTap,
+          page : feature.page,
         );
       }).toList(),
     );
