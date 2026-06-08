@@ -6,12 +6,14 @@ class NavItem {
   final String label;
   final int index;
   final List<UserRole> allowedRoles;
+  final bool requiresRegion;
 
   const NavItem({
     required this.icon,
     required this.label,
     required this.index,
     required this.allowedRoles,
+    this.requiresRegion = false,
   });
 }
 

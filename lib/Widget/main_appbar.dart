@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:saspri_mobile/pages/feature/notification.dart';
 
 class MainAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -99,13 +100,20 @@ class MainAppBar extends StatelessWidget
 
           /// NOTIFICATION BUTTON
           IconButton(
-            onPressed: onNotificationTap,
             splashRadius: 22,
             icon: const Icon(
               Icons.notifications_none_rounded,
               color: Colors.white,
               size: 24,
             ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NotificationList(),
+                ),
+              );
+            },
           ),
         ],
       ),

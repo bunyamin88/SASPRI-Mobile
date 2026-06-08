@@ -1,108 +1,187 @@
 import 'package:flutter/material.dart';
-import 'package:saspri_mobile/Pages/main_pages.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:saspri_mobile/pages/main_pages.dart';
+import 'package:saspri_mobile/pages/splash_page.dart';
+import 'package:saspri_mobile/providers/auth_provider.dart';
+
 import 'package:saspri_mobile/Widget/main_appbar.dart';
-import 'package:saspri_mobile/Widget/button/nav_button.dart';
 import 'package:saspri_mobile/Widget/nav_button_list.dart';
-import 'package:saspri_mobile/Widget/progress_bar.dart';
-import 'package:saspri_mobile/Widget/region_card/region_admin_card.dart';
-import 'package:saspri_mobile/Widget/region_choice.dart';
-import 'package:saspri_mobile/Widget/user_card/user_card.dart';
+
 import 'package:saspri_mobile/helper/colorpallate.dart';
 import 'package:saspri_mobile/helper/enum.dart';
-import 'package:saspri_mobile/models/user.dart';
-import 'Widget/region_card/region_rep_card.dart';
-
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+  });
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return MaterialApp(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
+      title: 'SASPRI',
+
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: const Color.fromRGBO(103, 58, 183, 1)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromRGBO(
+            103,
+            58,
+            183,
+            1,
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+
+      home: const SplashPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+class MyHomePage
+    extends ConsumerStatefulWidget {
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  const MyHomePage({
+    super.key,
+    required this.title,
+  });
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage>
+      createState() =>
+          _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  UserRole role = UserRole.member;
-  final user = User(name: "Ahmad Afif", role: UserRole.rep);
-  int currentIndex = 0;
+class _MyHomePageState
+    extends ConsumerState<MyHomePage> {
   
   @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    List<Widget> pages = [
-    MainPage(/* user: user */),
-    RegionPage(user: user),
-    CertPage(user: user),
-    AdminVerifyPage(/* user: user */),
-    AdminCertPage(/* user: user */),
-    ProfilPage(/* user: user */),
-    LoginPage(/* user: user */),
-  ];
-    return Scaffold(
-      backgroundColor: ColorPallate.background,
-      appBar: MainAppBar(
-              name: "Ahmad Afif",
-              role: role.label,
-              onNotificationTap: () {},
+  void initState() {
+    super.initState();
+
+    ref.listenManual(
+      authProvider,
+      (previous, next) {
+
+        if (
+          previous?.status ==
+              AuthStatus
+                  .authenticated &&
+          next.status ==
+              AuthStatus
+                  .unauthenticated
+        ) {
+
+          setState(() {
+
+            currentIndex = 0;
+
+          });
+        }
+
+        if (
+          previous?.status ==
+              AuthStatus
+                  .unauthenticated &&
+          next.status ==
+              AuthStatus
+                  .authenticated
+        ) {
+
+          setState(() {
+
+            currentIndex = 0;
+
+          });
+        }
+
+      },
+    );
+  }
+
+  int currentIndex = 0;
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+
+    final auth =
+        ref.watch(authProvider);
+
+    final user = auth.user;
+
+    final role =
+        user?.role ??
+        UserRole.guest;
+
+    final name =
+        user?.username ??
+        "Guest";
+
+    final pages = <Widget>[
+      const MainPage(),
+
+      /// sesuaikan dengan constructor
+      RegionPage(),
+
+      CertPage(),
+
+      AdminVerifyPage(),
+
+      AdminCertPage(),
+
+      ProfilPage(
+        onLogout: () {
+
+          setState(() {
+            currentIndex = 0;
+          });
+
+        },
       ),
-      body:  Center(
+
+      const LoginPage(),
+    ];
+
+    return Scaffold(
+      backgroundColor:
+          ColorPallate.background,
+
+      appBar: MainAppBar(
+        name: name,
+        role: role.label,
+        onNotificationTap: () {},
+      ),
+
+      body: Center(
         child: SingleChildScrollView(
-          child: pages[currentIndex]
+          child: pages[currentIndex],
         ),
       ),
+
       bottomNavigationBar: SafeArea(
-        child: NavButtonList(role: user.role, currentIndex: currentIndex, onChanged: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        })
-      )
+        child: NavButtonList(
+          currentIndex: currentIndex,
+          onChanged: (index) {
+            setState(() {
+              currentIndex = index;
+            });
+          },
+        ),
+      ),
     );
   }
 }
