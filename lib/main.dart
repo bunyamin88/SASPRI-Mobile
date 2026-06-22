@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:saspri_mobile/pages/main_pages.dart';
 import 'package:saspri_mobile/pages/splash_page.dart';
@@ -11,7 +12,10 @@ import 'package:saspri_mobile/Widget/nav_button_list.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
 import 'package:saspri_mobile/helper/enum.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('id_ID');
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -139,9 +143,9 @@ class _MyHomePageState
 
       CertPage(),
 
-      AdminVerifyPage(),
+      //AdminVerifyPage(),
 
-      AdminCertPage(),
+      AdminActivityPage(),
 
       ProfilPage(
         onLogout: () {

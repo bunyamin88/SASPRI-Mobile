@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:saspri_mobile/pages/feature/notification.dart';
+import 'package:saspri_mobile/pages/notification.dart';
+
 
 class MainAppBar extends StatelessWidget
     implements PreferredSizeWidget {

@@ -7,6 +7,7 @@ class RegionRepCard extends StatelessWidget {
   final String code;
   final String submissionDate;
   final String status;
+  final bool isRejected;
   final VoidCallback? onTap;
 
   const RegionRepCard({
@@ -16,8 +17,35 @@ class RegionRepCard extends StatelessWidget {
     required this.code,
     required this.submissionDate,
     required this.status,
+    required this.isRejected,
     this.onTap,
   });
+
+  Color _getGradeColor() {
+    if (isRejected) {
+      return ColorPallate.danger;
+    }
+
+    final grade = initial.trim().toLowerCase();
+
+    if (grade.isEmpty || grade == "-") {
+      return ColorPallate.buttonPrimary;
+    }
+
+    switch (grade) {
+      case "a":
+      case "ab":
+      case "b":
+        return ColorPallate.green;
+
+      case "bc":
+      case "c":
+        return ColorPallate.warning;
+
+      default:
+        return ColorPallate.buttonPrimary;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,26 +73,27 @@ class RegionRepCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
               children: [
-                /// LEFT SECTION
                 Expanded(
                   child: Row(
                     children: [
-                      /// AVATAR
                       Container(
                         width: 45,
                         height: 45,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF6B78B9),
+                        decoration: BoxDecoration(
+                          color: _getGradeColor(),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
-                            initial,
+                            initial.toUpperCase(),
                             style: const TextStyle(
                               fontSize: 24,
                               color: Colors.white,
+                              fontWeight:
+                                  FontWeight.bold,
                             ),
                           ),
                         ),
@@ -72,31 +101,39 @@ class RegionRepCard extends StatelessWidget {
 
                       const SizedBox(width: 12),
 
-                      /// USER INFO
                       Expanded(
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize:
+                              MainAxisSize.min,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Text(
-                              name,
+                              name.toUpperCase(),
                               softWrap: true,
-                              overflow: TextOverflow.visible,
-                              style: const TextStyle(
-                                fontSize: 14,
+                              overflow:
+                                  TextOverflow.visible,
+                              style:
+                                  const TextStyle(
+                                fontSize: 16,
                               ),
                             ),
+
                             Text(
                               code,
-                              style: const TextStyle(
+                              style:
+                                  const TextStyle(
                                 fontSize: 14,
                               ),
                             ),
+
                             Text(
                               "Pengajuan : $submissionDate",
-                              style: const TextStyle(
+                              style:
+                                  const TextStyle(
                                 fontSize: 12,
-                                color: Colors.black54,
+                                color:
+                                    Colors.black54,
                               ),
                             ),
                           ],
@@ -106,15 +143,14 @@ class RegionRepCard extends StatelessWidget {
                   ),
                 ),
 
-                /// STATUS
                 SizedBox(
-                  width: 90,
+                  width: 100,
                   child: Text(
                     status,
                     textAlign: TextAlign.right,
                     softWrap: true,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
+import 'package:saspri_mobile/helper/enum.dart';
 
 class UserCard extends StatelessWidget {
   final String? labelLeft;
@@ -11,6 +12,7 @@ class UserCard extends StatelessWidget {
   final String? textRight2;
 
   final IconData? iconright;
+  final ApprovalStatus? status;
 
   final VoidCallback? onTap;
 
@@ -23,9 +25,33 @@ class UserCard extends StatelessWidget {
     this.textRight1,
     this.textRight2,
     this.iconright,
+    this.status,
     this.onTap,
   });
 
+  Widget statusBadge({
+  required String text,
+  required Color color,
+}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 12,
+      vertical: 6,
+    ),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -124,7 +150,7 @@ class UserCard extends StatelessWidget {
                           const SizedBox(height: 2),
 
                           Text(
-                            'Pengajuan : $textLeft3',
+                            '$textLeft3',
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontFamily: 'Inter',
@@ -189,11 +215,31 @@ class UserCard extends StatelessWidget {
             ],
             // RIGHT SECTION ICON
             if (iconright != null) ...[
-              Container(
-                child: Icon(iconright, color: ColorPallate.buttonPrimary,)
+              
+              Icon(iconright, color: ColorPallate.buttonPrimary,)
                 
-              )
+              
             ],
+            if (status != null)
+            
+              switch (status) {
+                ApprovalStatus.pending => statusBadge(
+                  text: "Menunggu",
+                  color: ColorPallate.warning,
+                ),
+
+                ApprovalStatus.approved => statusBadge(
+                  text: "Disetujui",
+                  color: ColorPallate.primary,
+                ),
+
+                ApprovalStatus.rejected => statusBadge(
+                  text: "Ditolak",
+                  color: ColorPallate.danger,
+                ),
+
+                _ => const SizedBox(),
+              },
           ],
         ),
       ),
