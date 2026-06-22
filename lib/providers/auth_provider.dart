@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saspri_mobile/helper/enum.dart';
+import 'package:saspri_mobile/services/exception.dart';
 
 import '../models/auth_state.dart';
 import '../repositories/auth_repository.dart';
@@ -96,12 +98,11 @@ class AuthNotifier
   }
 
   Future<void> login(
-    String email,
-    String password,
-  ) async {
-
-    final repository =
-        ref.read(
+  String email,
+  String password,
+) async {
+  try {
+    final repository = ref.read(
       authRepositoryProvider,
     );
 
@@ -116,26 +117,28 @@ class AuthNotifier
       loginResult.accessToken,
     );
 
-    final storage =
-        ref.read(
+    final storage = ref.read(
       secureStorageProvider,
     );
 
     await storage.write(
       key: 'access_token',
-      value:
-          loginResult.accessToken,
+      value: loginResult.accessToken,
     );
 
     state = AuthState(
-      status:
-          AuthStatus
-              .authenticated,
-      token:
-          loginResult.accessToken,
+      status: AuthStatus.authenticated,
+      token: loginResult.accessToken,
       user: user,
     );
+  } on DioException catch (e) {
+
+    throw AppException(
+      e.response?.data['message'] ??
+          'Login gagal',
+    );
   }
+}
 
   Future<void> logout() async {
 

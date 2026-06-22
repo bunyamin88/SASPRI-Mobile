@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:saspri_mobile/helper/colorpallate.dart';
-import 'package:saspri_mobile/pages/feature/admin_cert/cert_ongoing.dart';
-import 'package:saspri_mobile/pages/feature/admin_cert/peerteam_req.dart';
+import 'package:saspri_mobile/pages/feature/admin_act/cert_ongoing.dart';
+import 'package:saspri_mobile/pages/feature/admin_act/peerteam_req.dart';
 import 'package:saspri_mobile/pages/feature/admin_verify/region_regist_req.dart';
-import 'package:saspri_mobile/pages/feature/admin_verify/rep_change_req.dart';
+import 'package:saspri_mobile/pages/feature/admin_act/rep_change_req.dart';
 import 'package:saspri_mobile/pages/feature/certification/activity_history.dart';
 import 'package:saspri_mobile/pages/feature/certification/cert_history.dart';
 import 'package:saspri_mobile/pages/feature/certification/cert_submission.dart';
@@ -22,6 +23,7 @@ import 'package:saspri_mobile/models/feature_item.dart';
 import 'package:saspri_mobile/models/user.dart';
 
 import 'package:saspri_mobile/providers/auth_provider.dart';
+import 'package:saspri_mobile/providers/storage_provider.dart';
 import 'package:saspri_mobile/widget/button/primary_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -56,13 +58,7 @@ class _MainPageState extends State<MainPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               
             children: [
-                RegionRepCard(
-                  initial: 'A',
-                  name: 'Cisarua, Bogor, Jawa Barat',
-                  code: '12345',
-                  submissionDate: '2023-10-01',
-                  status: 'Selesai Tidak Lulus',
-                ),
+                
                 UserCard(
                   //labelLeft: 'b',
                   textLeft1: "Ahmad Afif",
@@ -143,15 +139,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         PrimaryButton(
           onPressed: () async {
 
-            await ref
-                .read(
-                  authProvider
-                      .notifier,
-                )
-                .login(
-                  usernameController.text,
-                  passwordController.text,
-                );
+            try {
+              await ref
+                  .read(authProvider.notifier)
+                  .login(usernameController.text, passwordController.text);
+
+            } catch (e) {
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(
+                SnackBar(
+                  content: Text(
+                    e.toString(),
+                  ),
+                ),
+              );
+            }
           },
           text: "Login",
           backgroundColor: ColorPallate.primary,
@@ -198,8 +203,7 @@ class CertPage extends ConsumerWidget {
       FeatureItem(
         icon: Icons.archive_outlined,
         label: "Riwayat Sertifikasi",
-        page: CertificationHistoryPageState(
-          user: user,
+        page: CertificationHistoryPage(
         ),
         allowedRoles: [
           UserRole.member,
@@ -275,7 +279,6 @@ class RegionPage extends ConsumerWidget {
         icon: Icons.group,
         label: "Anggota Kawasan",
         page: MemberList(
-          user: user,
         ),
         allowedRoles: [
           UserRole.member,
@@ -309,6 +312,7 @@ class ProfilPage extends ConsumerWidget {
 
     final user =
         ref.watch(authProvider).user;
+    final token = ref.watch(authProvider).token;
 
     if (user == null) {
       return const Center(
@@ -328,6 +332,9 @@ class ProfilPage extends ConsumerWidget {
           Text(
             "Role: ${user.role.label}",
           ),
+          Text(
+            "token: $token",
+          ),
           SizedBox(
             width: 200,
             child: PrimaryButton(
@@ -342,15 +349,15 @@ class ProfilPage extends ConsumerWidget {
               text: "Logout",
               backgroundColor: ColorPallate.primary,
             ),
-          )
+          ),        
         ],
       ),
     );
   }
 }
 
-class AdminCertPage extends ConsumerWidget {
-  const AdminCertPage({
+class AdminActivityPage extends ConsumerWidget {
+  const AdminActivityPage({
     super.key,
   });
 
@@ -389,49 +396,6 @@ class AdminCertPage extends ConsumerWidget {
           UserRole.admin,
         ],
       ),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: FeatureGrid(
-        role: user.role,
-        features: listFeatureItems,
-      ),
-    );
-  }
-}
-
-class AdminVerifyPage extends ConsumerWidget {
-  const AdminVerifyPage({
-    super.key,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-
-    final user =
-        ref.watch(authProvider).user;
-
-    if (user == null) {
-      return const Center(
-        child: Text(
-          "Silakan login terlebih dahulu",
-        ),
-      );
-    }
-
-    final listFeatureItems = [
-      FeatureItem(
-        icon: Icons.app_registration_outlined,
-        label: "Pendaftaran Kawasan",
-        page: RegistrationRegionRequest(),
-        allowedRoles: [
-          UserRole.admin,
-        ],
-      ),
 
       FeatureItem(
         icon: Icons.switch_account,
@@ -452,4 +416,56 @@ class AdminVerifyPage extends ConsumerWidget {
     );
   }
 }
+
+// class AdminVerifyPage extends ConsumerWidget {
+//   const AdminVerifyPage({
+//     super.key,
+//   });
+
+//   @override
+//   Widget build(
+//     BuildContext context,
+//     WidgetRef ref,
+//   ) {
+
+//     final user =
+//         ref.watch(authProvider).user;
+
+//     if (user == null) {
+//       return const Center(
+//         child: Text(
+//           "Silakan login terlebih dahulu",
+//         ),
+//       );
+//     }
+
+//     final listFeatureItems = [
+//       FeatureItem(
+//         icon: Icons.app_registration_outlined,
+//         label: "Pendaftaran Kawasan",
+//         page: RegistrationRegionRequest(),
+//         allowedRoles: [
+//           UserRole.admin,
+//         ],
+//       ),
+
+//       FeatureItem(
+//         icon: Icons.switch_account,
+//         label: "Pergantian Wali",
+//         page: RepresentativeChangeRequest(),
+//         allowedRoles: [
+//           UserRole.admin,
+//         ],
+//       ),
+//     ];
+
+//     return Container(
+//       padding: const EdgeInsets.all(8),
+//       child: FeatureGrid(
+//         role: user.role,
+//         features: listFeatureItems,
+//       ),
+//     );
+//   }
+// }
 
